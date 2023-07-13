@@ -12,6 +12,7 @@
 namespace nystudio107\instantanalyticsGa4\ga4;
 
 use Br33f\Ga4\MeasurementProtocol\Dto\Event\AbstractEvent;
+use Br33f\Ga4\MeasurementProtocol\Dto\Event\PurchaseEvent;
 use Br33f\Ga4\MeasurementProtocol\Dto\Request\BaseRequest;
 use Br33f\Ga4\MeasurementProtocol\Dto\Response\BaseResponse;
 use Br33f\Ga4\MeasurementProtocol\HttpClient;
@@ -124,7 +125,29 @@ class Analytics
         }
 
         $request = $this->request();
-        $eventCount = count($request->getEvents()->getEventList());
+        $eventList = $request->getEvents()->getEventList();
+        $eventCount = count($eventList);
+        foreach ($eventList as $event) {
+            $fileName = Craft::getAlias('@storage/logs/analytic_ga4.log');
+
+            $purchaseLogFile = false;
+            if ($event instanceof PurchaseEvent) {
+                $purchaseLogFile = Craft::getAlias('@storage/logs/purchase_analytic_ga4.log');
+            }
+
+            $logDate = date('m/d H:i:s');
+            $msg = "[{$logDate}] Sending '{$event->getName()}', context: ".PHP_EOL;
+            $clientId = $request->getClientId();
+            $sessionId = $event->getParamValue('session_id');;
+            $sessionNumber = $event->getParamValue('session_number');
+            $msg .= "[{$logDate}] ClientID: $clientId".PHP_EOL;
+            $msg .= "[{$logDate}] SessionID: $sessionId".PHP_EOL;
+            $msg .= "[{$logDate}] SessionNumber: $sessionNumber".PHP_EOL;
+            \craft\helpers\FileHelper::writeToFile($fileName, $msg, ['append' => true]);
+            if ($purchaseLogFile) {
+                \craft\helpers\FileHelper::writeToFile($purchaseLogFile, $msg, ['append' => true]);
+            }
+        }
 
         if (!InstantAnalytics::$settings->sendAnalyticsData) {
             InstantAnalytics::$plugin->logAnalyticsEvent(
