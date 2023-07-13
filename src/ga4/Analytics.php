@@ -160,11 +160,11 @@ class Analytics
         }
 
         if ($eventCount === 0) {
-            InstantAnalytics::$plugin->logAnalyticsEvent(
-                'No events collected to send',
-                [],
-                __METHOD__
-            );
+//            InstantAnalytics::$plugin->logAnalyticsEvent(
+//                'No events collected to send',
+//                [],
+//                __METHOD__
+//            );
 
             return null;
         }
