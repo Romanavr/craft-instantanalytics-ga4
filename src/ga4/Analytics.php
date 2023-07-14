@@ -129,6 +129,14 @@ class Analytics
         $service = $this->service();
 
         if (!$service) {
+            foreach ($this->_request->getEvents()->getEventList() as $event) {
+                InstantAnalytics::$plugin->logAnalyticsEvent(
+                    'Service is `false` for `{eventName}` — {result}',
+                    ['eventName' => $event->getName(), 'result' => $service],
+                    __METHOD__
+                );
+            }
+
             return null;
         }
 
