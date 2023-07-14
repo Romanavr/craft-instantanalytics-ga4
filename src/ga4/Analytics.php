@@ -114,6 +114,14 @@ class Analytics
             $this->_shouldSendAnalytics = AnalyticsHelper::shouldSendAnalytics();
         }
 
+        foreach ($this->_request->getEvents()->getEventList() as $event) {
+            InstantAnalytics::$plugin->logAnalyticsEvent(
+                'Should sent analytic for `{eventName}`? {result}',
+                ['eventName' => $event->getName(), 'result' => $this->_shouldSendAnalytics],
+                __METHOD__
+            );
+        }
+
         if (!$this->_shouldSendAnalytics) {
             return null;
         }
