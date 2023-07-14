@@ -223,7 +223,8 @@ GTAG;
 
     public function logAnalyticsEvent(string $message, array $variables = [], string $category = ''): void
     {
-        $log = Craft::t('instant-analytics-ga4', $message, $variables).PHP_EOL;
+        $logDate = date('m/d H:i:s');
+        $log = "[$logDate] ".Craft::t('instant-analytics-ga4', $message, $variables).PHP_EOL;
         $logFile = Craft::getAlias('@storage/logs/instant_analytics_4.log');
         \craft\helpers\FileHelper::writeToFile($logFile, $log, ['append' => true]);
 
