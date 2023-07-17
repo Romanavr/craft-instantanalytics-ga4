@@ -291,26 +291,27 @@ class Analytics
      * getSessionCookie handles the parsing of the _ga_*MEASUREMENT ID* cookie
      * unique identifier of session ID & number
      *
-     * @return string the cid
+     * @return null|array $sessionCookie
      */
     public static function getSessionCookie(): ?array
     {
-        $sessionCookie = null;
         $measurementId = App::parseEnv(InstantAnalytics::$settings->googleAnalyticsMeasurementId);
         $cookieName = '_ga_' . StringHelper::removeLeft($measurementId, 'G-');
         if (isset($_COOKIE[$cookieName])) {
+            $sessionCookie = null;
+
             $parts = explode(".", $_COOKIE[$cookieName], 5);
-            if ($parts !== false) {
+            if ($parts && count($parts) > 1) {
                 $sessionCookie = implode('.', array_slice($parts, 2, 2));
             }
 
-            if (strpos($sessionCookie, '.') !== false) {
+            if (str_contains($sessionCookie, '.')) {
                 [$sessionId, $sessionNumber] = explode('.', $sessionCookie);
                 return ['sessionId' => $sessionId, 'sessionNumber' => $sessionNumber];
             }
         }
 
-        return $sessionCookie;
+        return null;
     }
 
     /**
